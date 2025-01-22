@@ -27,7 +27,7 @@
  *====================*/
 
 /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
-#define LV_COLOR_DEPTH 16
+#define LV_COLOR_DEPTH 32
 
 /*=========================
    STDLIB WRAPPER SETTINGS
@@ -965,7 +965,11 @@ extern void mp_lv_init_gc();
 #define LV_USE_TFT_ESPI         0
 
 /*Driver for evdev input devices*/
-#define LV_USE_EVDEV    0
+#ifdef MICROPY_EVDEV
+	#define LV_USE_EVDEV    MICROPY_EVDEV
+#else
+	#define LV_USE_EVDEV    0
+#endif
 
 /*Driver for libinput input devices*/
 #define LV_USE_LIBINPUT    0

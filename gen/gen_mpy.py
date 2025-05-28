@@ -2826,19 +2826,23 @@ def gen_global(global_name, global_type_ast):
         wrapped_type = lv_mp_type[global_type]
         if not wrapped_type:
             raise MissingConversionException('Missing conversion to %s when generating global %s' % (wrapped_type, global_name))
-        global_type = sanitize("_lv_mp_%s_wrapper" % wrapped_type)
-        custom_struct_str = """
+
+        if "lv_" + wrapped_type in generated_global:
+            global_type = "lv_" + wrapped_type
+        else:
+            global_type = sanitize("_lv_mp_%s_wrapper" % wrapped_type)
+            custom_struct_str = """
 typedef struct {{
     {type} value;
 }} {name};
-        """.format(
-            type = wrapped_type,
-            name = global_type)
-        if global_type not in generated_structs:
-            print("/* Global struct wrapper for %s */" % wrapped_type)
-            print(custom_struct_str)
-            # eprint("%s: %s\n" % (wrapped_type, custom_struct_str))
-            try_generate_struct(global_type, parser.parse(custom_struct_str).ext[0].type.type)
+            """.format(
+                type = wrapped_type,
+                name = global_type)
+            if global_type not in generated_structs:
+                print("/* Global struct wrapper for %s */" % wrapped_type)
+                print(custom_struct_str)
+                # eprint("%s: %s\n" % (wrapped_type, custom_struct_str))
+                try_generate_struct(global_type, parser.parse(custom_struct_str).ext[0].type.type)
 
     print("""
 /*
